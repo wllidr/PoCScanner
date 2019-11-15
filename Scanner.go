@@ -152,11 +152,6 @@ func worker1(wg *sync.WaitGroup) {
 		//Timeout: 30 * time.Second,
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
-			//DialContext: (&net.Dialer{
-			//	Timeout:   30 * time.Second,
-			//	Deadline:time.Now().Add(10 * time.Second),
-			//}).DialContext, //会导致提前结束
-
 			Dial: func(netw, addr string) (net.Conn, error) {
 				deadline := time.Now().Add(15 * time.Second)
 				c, err := net.DialTimeout(netw, addr, time.Second*13)
@@ -169,19 +164,6 @@ func worker1(wg *sync.WaitGroup) {
 			},
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
-
-		//Transport: &http.Transport{
-		//	DialContext: (&net.Dialer{
-		//		Timeout:   8 * time.Second,
-		//		Deadline:time.Now().Add(10 * time.Second),
-		//	}).DialContext,
-		//	//MaxIdleConns:          200,
-		//	//IdleConnTimeout:       10 * time.Second,
-		//	//TLSHandshakeTimeout:   10 * time.Second,
-		//	//ExpectContinueTimeout: 10 * time.Second,
-		//	//TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
-		//},
-
 	}
 	header := map[string]string{
 		//"Host":                      "movie.douban.com",
@@ -215,7 +197,8 @@ func worker1(wg *sync.WaitGroup) {
 			fmt.Println("IO error: ", err.Error(), "url: ", url)
 		}
 		content := string(body)
-
+		
+		//响应包的判断条件:
 		switch strings.Contains(content, "Running Job List") { //Apache Flink
 		//switch strings.Contains(content,"groups") { //Apache solr RCE
 		//switch strings.Contains(content,"Nginx http upstream check status") {
