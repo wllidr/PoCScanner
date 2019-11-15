@@ -266,13 +266,9 @@ var targetHitCounter int
 
 func main() {
 	startTime := time.Now()
-	//filePath:="D://GoPro//testURL.txt"
-	//noDns:="K:\\Desktop\\multitest\\source\\pa_ip_dns_20190628.txt"
-	noDns := "K:\\Desktop\\multitest\\result\\alibaba_ip_20191114_unique_C.txt"
-	//noDns:="D:\\GoPro\\testURL.txt"
-	//filePath := "K:\\Desktop\\multitest\\source\\pa-dns-20190624.txt"
+	noDns := "K:\\Desktop\\multitest\\result\\Target_ip_20191114_unique_C.txt"
 	go readFile(noDns, urls, &lineCounter)
-	noOfWorkers := 3000
+	noOfWorkers := 3000 //3000并发连接
 	done := make(chan bool)
 	go getResult(done)
 	workerPool(noOfWorkers)
